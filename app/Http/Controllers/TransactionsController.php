@@ -170,7 +170,6 @@ class TransactionsController extends Controller
 
         foreach ($alternatives as $alternative) {
             $normalizedRow = [];
-            // dd($alternative->initials);
             foreach ($criteriaNames as $criteriaName) {
                 $value = Transactions::where('gudangs_id', $alternative->id)
                     ->whereHas('creteria', function ($query) use ($criteriaName) {

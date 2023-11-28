@@ -102,7 +102,7 @@
                                         <th scope="col">
                                             {{ 'C' . $loop->index + 1 }}
                                             <br />
-                                            ({{ $criteria['weight'] }})
+                                            ({{ $criteria['type'] }})
                                         </th>
                                     @endforeach
                                 </tr>
