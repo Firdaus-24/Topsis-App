@@ -38,11 +38,11 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url('creteria') }}">Criteria</a></li>
-                            {{-- <li><a class="dropdown-item" href="{{ url('alternatif') }}">Alternatif</a></li> --}}
+                            <li><a class="dropdown-item" href="{{ url('transactions') }}">Transaksi</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="{{ url('transactions') }}">Transaksi</a></li>
+                            <li><a class="dropdown-item" href="{{ route('resultTopsis') }}">Result Topsis</a></li>
                         </ul>
                     </li>
 
