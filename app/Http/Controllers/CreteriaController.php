@@ -15,10 +15,10 @@ class CreteriaController extends Controller
      */
     public function index()
     {
-        $data = Creteria::paginate(5);
+        $data = Creteria::paginate(10);
 
         if (request('search-creteria')) {
-            $data = Creteria::where('nama', 'like', '%' . request('search-creteria') . '%')->paginate(5);
+            $data = Creteria::where('nama', 'like', '%' . request('search-creteria') . '%')->paginate(10);
         }
 
         return view('creteria.index')->with(['data' => $data]);
@@ -42,6 +42,7 @@ class CreteriaController extends Controller
             'nama' =>  strtoupper($request->txtnama),
             'type' =>  $request->txttype,
             'bobot' =>  $request->txtbobot,
+            'is_active' =>  1,
         ]);
 
         return back()->with('success', 'data berhasil di simpan');

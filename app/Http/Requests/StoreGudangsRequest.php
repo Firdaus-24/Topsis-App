@@ -24,10 +24,10 @@ class StoreGudangsRequest extends FormRequest
         return [
             'txtnama' => 'required|unique:gudangs,nama|min:3|max:50',
             'status' => 'required',
-            'txtkota' => 'required|unique:gudangs,kota|min:5|max:50',
-            'txtkecamatan' => 'required|unique:gudangs,kecamatan|min:5|max:50',
-            'txtlong' => 'required|unique:gudangs,longitude|min:5|max:50',
-            'txtlat' => 'required|unique:gudangs,latitude|min:5|max:50',
+            'txtkota' => 'required|min:5|max:50',
+            'txtkecamatan' => 'required|min:5|max:50',
+            'txtlong' => 'required|min:5|max:50',
+            'txtlat' => 'required|min:5|max:50',
             'tglsewa' => 'required|date'
 
         ];

@@ -163,8 +163,7 @@ class TransactionsController extends Controller
     }
     private function Matrix()
     {
-        $alternatives = Gudangs::all();
-        // dd($alternatives);
+        $alternatives = DB::table('gudangs')->where('is_active', '=', 1)->get();
         $criteriaNames = Creteria::pluck('nama');
         $Matrix = [];
 
@@ -189,11 +188,20 @@ class TransactionsController extends Controller
         // dd($Matrix);
         return $Matrix;
     }
-
+    private function allValuesAreNullOrZero($array)
+    {
+        foreach ($array as $value) {
+            if ($value !== null && $value !== "0.000") {
+                return false;
+            }
+        }
+        return true;
+    }
+    // Step 1: Normalize the Decision Matrix
     private function normalizeDecisionMatrix()
     {
         // Retrieve all alternatives
-        $alternatives = Gudangs::all();
+        $alternatives = DB::table('gudangs')->where('is_active', '=', 1)->get();
         $criteriaNames = Creteria::pluck('nama');
         $normalizedMatrix = [];
         $divisors = []; // Array to store divisors for each criterion
@@ -203,7 +211,6 @@ class TransactionsController extends Controller
             $sumOfSquares = Transactions::whereHas('creteria', function ($query) use ($criteriaName) {
                 $query->where('nama', $criteriaName);
             })->sum(DB::raw('POWER(value, 2)'));
-
             // Calculate the divisor as the square root of the sum of squares
             $divisor = sqrt($sumOfSquares);
             // Format the divisor with three decimal places
@@ -230,22 +237,28 @@ class TransactionsController extends Controller
                         $query->where('nama', $criteriaName);
                     })
                     ->value('value');
-
                 // Normalize the value by dividing it with the corresponding divisor
                 $normalizedValue = $divisors[$criteriaName] !== 0 ? $value / $divisors[$criteriaName] : 0;
+                // dd($normalizedValue);
                 // $formattedValue = round($normalizedValue, 3);
                 $formattedValue = number_format(round($normalizedValue, 3), 3, '.', '');
 
                 $normalizedRow[] = $formattedValue;
             }
 
-            $normalizedMatrix[$alternative->id] = [
-                'id' => $alternative->id,
-                'nama' => $alternative->nama,
-                'values' => $normalizedRow,
-            ];
+            // $normalizedMatrix[$alternative->id] = [
+            //     'id' => $alternative->id,
+            //     'nama' => $alternative->nama,
+            //     'values' => $normalizedRow,
+            // ];
+            if (!$this->allValuesAreNullOrZero($normalizedRow)) {
+                $normalizedMatrix[$alternative->id] = [
+                    'id' => $alternative->id,
+                    'nama' => $alternative->nama,
+                    'values' => $normalizedRow,
+                ];
+            }
         }
-        // dd($normalizedMatrix);
         return $normalizedMatrix;
     }
 
@@ -269,7 +282,6 @@ class TransactionsController extends Controller
             foreach ($values as $index => $normalizedValue) {
                 // dd($criteriaWeights[$index]['bobot']);
                 $weightedValue = number_format($normalizedValue * $criteriaWeights[$index]['bobot'], 3, '.', '');
-                // $weightedRow[] = $weightedValue;
                 $weightedRow[] = [
                     'criteria_id' => $criteriaWeights[$index]['id'],
                     'type' => $criteriaWeights[$index]['type'],
@@ -308,9 +320,8 @@ class TransactionsController extends Controller
                             'criteria_id' => $criteria['id'],
                             'nama' => $criteria['nama'],
                             'type' => $criteria['type'],
-                            'value' => number_format($criteria['bobot'] * $data['value'], 3, '.', ',')
-                            // round($criteria['bobot'] * $data['value'], 3)
-                            // number_format($criteria['bobot'] * $data['value'], 3, '.', ',')
+                            'value' => number_format($criteria['bobot'] * $data['value'], 4, '.', ',')
+
                         ];
                     }
                 }
@@ -332,29 +343,29 @@ class TransactionsController extends Controller
 
                 if ($criteria['type'] == 'BENEFIT') {
                     $maxValues[$criteriaId] = isset($maxValues[$criteriaId])
-                        ? max($maxValues[$criteriaId], number_format($value, 3, '.', ','))
-                        : number_format($value, 3, '.', ',');
+                        ? max($maxValues[$criteriaId], number_format($value, 4, '.', ','))
+                        : number_format($value, 4, '.', ',');
 
                     $minValues[$criteriaId] = isset($minValues[$criteriaId])
-                        ? min($minValues[$criteriaId], number_format($value, 3, '.', ','))
-                        : number_format($value, 3, '.', ',');
+                        ? min($minValues[$criteriaId], number_format($value, 4, '.', ','))
+                        : number_format($value, 4, '.', ',');
                 } elseif ($criteria['type'] == 'COST') {
                     $maxValues[$criteriaId] = isset($maxValues[$criteriaId])
-                        ? min($maxValues[$criteriaId], number_format($value, 3, '.', ','))
-                        : number_format($value, 3, '.', ',');
+                        ? min($maxValues[$criteriaId], number_format($value, 4, '.', ','))
+                        : number_format($value, 4, '.', ',');
 
                     $minValues[$criteriaId] = isset($minValues[$criteriaId])
-                        ? max($minValues[$criteriaId], number_format($value, 3, '.', ','))
-                        : number_format($value, 3, '.', ',');
+                        ? max($minValues[$criteriaId], number_format($value, 4, '.', ','))
+                        : number_format($value, 4, '.', ',');
                 }
             }
         }
         foreach ($maxValues as $maxValue) {
-            $maxValue = number_format($maxValue,  3, '.', ',');
+            $maxValue = number_format($maxValue,  4, '.', ',');
         }
 
         foreach ($minValues as $minValue) {
-            $minValue =  number_format($minValue,  3, '.', ',');
+            $minValue =  number_format($minValue,  4, '.', ',');
         }
 
 
@@ -400,7 +411,7 @@ class TransactionsController extends Controller
                 // Store the new value in the $newValuesMax array
                 $newValuesMax[$criteriaId] =  [
                     'creterias_id' => $criteriaId,
-                    'value' => number_format($newValue, 3, '.', ',')
+                    'value' => number_format($newValue, 4, '.', ',')
                     // round($criteria['weight'] * $data['value'], 3)
                 ];
 
@@ -410,12 +421,12 @@ class TransactionsController extends Controller
                 'id' => $item['id'],
                 'nama' => $item['nama'],
                 'dataMatrix' => $newValuesMax,
-                'dPositive' => number_format(sqrt($sumValues), 3, '.', ',')
+                'dPositive' => number_format(sqrt($sumValues), 4, '.', ',')
             ];
             $DMax[$item['id']] = [
                 'alternative_id' => $item['id'],
                 'nama' => $item['nama'],
-                'values' => number_format(sqrt($sumValues), 3, '.', ',')
+                'values' => number_format(sqrt($sumValues), 4, '.', ',')
             ];
         }
 
@@ -432,7 +443,7 @@ class TransactionsController extends Controller
                 // Store the new value in the $newValuesMin array
                 $newValuesMin[$criteriaId] =  [
                     'criteria_id' => $criteriaId,
-                    'value' => number_format($newValue, 3, '.', ',')
+                    'value' => number_format($newValue, 4, '.', ',')
                     // round($criteria['weight'] * $data['value'], 3)
                 ];
 
@@ -442,12 +453,12 @@ class TransactionsController extends Controller
                 'id' => $item['id'],
                 'name' => $item['nama'],
                 'dataMatrix' => $newValuesMin,
-                'dNegative' => number_format(sqrt($sumValues), 3, '.', ',')
+                'dNegative' => number_format(sqrt($sumValues), 4, '.', ',')
             ];
             $DMin[$item['id']] = [
                 'alternative_id' => $item['id'],
                 'name' => $item['nama'],
-                'values' => number_format(sqrt($sumValues), 3, '.', ',')
+                'values' => number_format(sqrt($sumValues), 4, '.', ',')
             ];
         }
         // dd($DMax,$DMin);
@@ -465,7 +476,8 @@ class TransactionsController extends Controller
     private function calculatePreference($distances)
     {
 
-        $alternatives = Gudangs::all();
+        $alternatives = Gudangs::with(['transactions'])
+            ->has('transactions')->where('is_active', '=', 1)->get();
         $DPositiveValues = $distances['DMax'];
         $DNegativeValues = $distances['DMin'];
         // dd($DPositiveValues);
@@ -484,7 +496,7 @@ class TransactionsController extends Controller
                 'nama' => $alternative->nama,
                 'DPositive_value' => $positiveValue,
                 'DNegative_value' => $negativeValue,
-                'result' => number_format($totalValue, 3, '.', ','),
+                'result' => number_format($totalValue, 4, '.', ','),
             ];
         }
 

@@ -14,4 +14,8 @@ class Gudangs extends Model
     {
         return $this->belongsTo(Statuses::class, 'status_id', 'id');
     }
+    public function transactions()
+    {
+        return $this->hasMany(Transactions::class, 'gudangs_id', 'id');
+    }
 }

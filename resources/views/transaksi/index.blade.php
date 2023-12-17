@@ -50,7 +50,7 @@
                 <tbody>
                     @foreach ($data as $p)
                         <tr>
-                            <th scope="row">{{ $loop->iteration }}</th>
+                            <th scope="row">{{ ($data->currentPage() - 1) * $data->perPage() + $loop->iteration }}</th>
                             <td>{{ $p->gudangs->nama }}</td>
                             <td>{{ $p->creteria->nama }}</td>
                             <td>{{ $p->value }}</td>
