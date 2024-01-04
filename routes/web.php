@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('transactions/{id}/edit', [TransactionsController::class, 'update'])->name('transaksiUpdate');
     Route::post('transactions/{id}', [TransactionsController::class, 'destroy'])->name('transaksiDelete');
     Route::get('topsis-result', [TransactionsController::class, 'topsis'])->name('resultTopsis');
+    Route::get('export-transactions', [TransactionsController::class, 'exportTransanction'])->name('exportTransaction');
 
 
     Route::get('/logout', [AutControlller::class, 'logout'])->name('logout');

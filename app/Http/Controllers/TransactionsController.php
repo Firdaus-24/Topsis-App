@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 // use Excel;
+
+use App\Exports\TransactionsExport;
 use App\Models\Gudangs;
 use App\Models\Creteria;
 use App\Models\Transactions;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Imports\TransactionsImport;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 
 class TransactionsController extends Controller
 {
@@ -49,9 +52,32 @@ class TransactionsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transactions $transactions)
+    public function exportTransanction(Transactions $transactions)
     {
-        //
+        $alternatives = DB::table('gudangs')->where('is_active', '=', 1)->get();
+        $criteriaNames = Creteria::pluck('nama');
+        $Matrix = [];
+
+        foreach ($alternatives as $alternative) {
+            $normalizedRow = [];
+            foreach ($criteriaNames as $criteriaName) {
+                $value = Transactions::where('gudangs_id', $alternative->id)
+                    ->whereHas('creteria', function ($query) use ($criteriaName) {
+                        $query->where('nama', $criteriaName);
+                    })
+                    ->value('value');
+
+                $normalizedRow[] = $value;
+            }
+
+            $Matrix[$alternative->id] = [
+                'id' => $alternative->id,
+                'name' => $alternative->nama,
+                'values' => $normalizedRow,
+            ];
+        }
+        $pdf = PDF::loadview('transaksi.export-transaksi', ['criterias' => $normalizedRow, 'matrix' => $Matrix]);
+        return $pdf->download('laporan-transaksi-pdf.pdf');
     }
 
     /**
@@ -246,11 +272,7 @@ class TransactionsController extends Controller
                 $normalizedRow[] = $formattedValue;
             }
 
-            // $normalizedMatrix[$alternative->id] = [
-            //     'id' => $alternative->id,
-            //     'nama' => $alternative->nama,
-            //     'values' => $normalizedRow,
-            // ];
+
             if (!$this->allValuesAreNullOrZero($normalizedRow)) {
                 $normalizedMatrix[$alternative->id] = [
                     'id' => $alternative->id,

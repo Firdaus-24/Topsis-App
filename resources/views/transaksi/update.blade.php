@@ -71,12 +71,21 @@
                             <div class="row">
                                 <div class="col-lg-6 mb-3">
                                     <label for="txtvalue" class="form-label">Value</label>
-                                    <input type="text"
-                                        class="form-control @error('txtvalue') is-invalid
-                                        
-                                    @enderror"
-                                        id="txtvalue" autocomplete="off" autofocus name="txtvalue"
-                                        value="{{ $data->value }}" required>
+                                    <select class="form-select" aria-label="Default select example" name="txtvalue"
+                                        id="txtvalue" required>
+                                        <option value="">Pilih</option>
+                                        <option value="1" {{ $data->value == 1 ? 'checked' : '' }}>Sangat di
+                                            rekomendasikan</option>
+                                        <option value="2" {{ $data->value == 2 ? 'checked' : '' }}>Baik di rekomendasi
+                                        </option>
+                                        <option value="3" {{ $data->value == 3 ? 'checked' : '' }}>Direkomendasikan
+                                        </option>
+                                        <option value="4" {{ $data->value == 4 ? 'checked' : '' }}>kurang di
+                                            rekomendasi</option>
+                                        <option value="5" {{ $data->value == 5 ? 'checked' : '' }}>tidak di
+                                            rekomendasi</option>
+                                    </select>
+
                                     @error('txtvalue')
                                         <div id="validationServerUsernameFeedback" class="invalid-feedback">
                                             {{ $message }}

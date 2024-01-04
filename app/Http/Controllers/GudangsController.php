@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Gudangs;
 use App\Models\Statuses;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreGudangsRequest;
 use App\Http\Requests\UpdateGudangsRequest;
 use App\Imports\GudangsImport;
@@ -130,7 +129,11 @@ class GudangsController extends Controller
 
     public function importGudangs(Request $request)
     {
-        Excel::import(new GudangsImport(), $request->file('file'));
+        $file = $request->file('file')->store('public/import');
+        // $import = new GudangsImport;
+        (new GudangsImport)->import($file, null, \Maatwebsite\Excel\Excel::XLSX);
+        // $import->import($file);
+        // Excel::import(new GudangsImport(), $request->file('file'));
         return back()->with('success', 'data berhasil di upload');
     }
 }
