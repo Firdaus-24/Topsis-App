@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Imports\CreteriaImport;
 use App\Http\Requests\StoreCreteriaRequest;
 use Excel;
+use App\Imports\GudangsImport;
 
 class CreteriaController extends Controller
 {
@@ -102,7 +103,10 @@ class CreteriaController extends Controller
 
     public function importCreteria(Request $request)
     {
-        Excel::import(new CreteriaImport(), $request->file('file'));
+        // Excel::import(new CreteriaImport(), $request->file('file'));
+        $file = $request->file('file')->store('public/import');
+
+        (new CreteriaImport)->import($file, null, \Maatwebsite\Excel\Excel::XLSX);
         return back()->with('success', 'data berhasil di upload');
     }
 }

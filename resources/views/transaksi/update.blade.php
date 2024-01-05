@@ -1,4 +1,5 @@
 @extends('layouts.main')
+
 @section('container')
     <div class="row">
         <div class="col-lg-12 text-center mt-3">
@@ -34,12 +35,9 @@
                                         
                                     @enderror"
                                         aria-label="Default select example" name="txtgudangid" id="txtgudangid" required>
-                                        <option value="">Pilih</option>
-                                        @foreach ($gudang as $g)
-                                            <option value="{{ $g->id }}"
-                                                {{ $data->gudangs_id == $g->id ? 'selected' : '' }}>{{ $g->nama }}
-                                            </option>
-                                        @endforeach
+                                        <option value="{{ $data->gudangs->id }}">
+                                            {{ $data->gudangs->nama }}
+                                        </option>
                                     </select>
                                     @error('txtgudangid')
                                         <div id="validationServerUsernameFeedback" class="invalid-feedback">
@@ -54,12 +52,7 @@
                                         
                                     @enderror"
                                         id="txtcreteria" name="txtcreteria" required>
-                                        <option value="">Pilih</option>
-                                        @foreach ($creteria as $c)
-                                            <option value="{{ $c->id }}"
-                                                {{ $data->creterias_id == $c->id ? 'selected' : '' }}>
-                                                {{ $c->nama }}</option>
-                                        @endforeach
+                                        <option value="{{ $data->creteria->id }}">{{ $data->creteria->nama }}</option>
                                     </select>
                                     @error('txtcreteria')
                                         <div id="validationServerUsernameFeedback" class="invalid-feedback">
@@ -73,17 +66,41 @@
                                     <label for="txtvalue" class="form-label">Value</label>
                                     <select class="form-select" aria-label="Default select example" name="txtvalue"
                                         id="txtvalue" required>
-                                        <option value="">Pilih</option>
-                                        <option value="1" {{ $data->value == 1 ? 'checked' : '' }}>Sangat di
-                                            rekomendasikan</option>
-                                        <option value="2" {{ $data->value == 2 ? 'checked' : '' }}>Baik di rekomendasi
-                                        </option>
-                                        <option value="3" {{ $data->value == 3 ? 'checked' : '' }}>Direkomendasikan
-                                        </option>
-                                        <option value="4" {{ $data->value == 4 ? 'checked' : '' }}>kurang di
-                                            rekomendasi</option>
-                                        <option value="5" {{ $data->value == 5 ? 'checked' : '' }}>tidak di
-                                            rekomendasi</option>
+                                        @if ($data->creteria->type == 'BENEFIT')
+                                            <option value="1" {{ $data->value == 1 ? 'selected' : '' }}>1 -
+                                                Sangat
+                                                kurang
+                                                rekomendasi </option>
+                                            <option value="2" {{ $data->value == 2 ? 'selected' : '' }}>2 -
+                                                Kurang
+                                                rekomendasi </option>
+                                            <option value="3" {{ $data->value == 3 ? 'selected' : '' }}>3 -
+                                                Rekomendasi
+                                            </option>
+                                            <option value="4" {{ $data->value == 4 ? 'selected' : '' }}>4 - Cukup
+                                                rekomendasi
+                                            </option>
+                                            <option value="5" {{ $data->value == 5 ? 'selected' : '' }}>5 -
+                                                Sangat
+                                                rekomendasi </option>
+                                        @else
+                                            <option value="1" {{ $data->value == 1 ? 'selected' : '' }}>1 -
+                                                Sangat
+                                                rekomendasi</option>
+                                            <option value="2" {{ $data->value == 2 ? 'selected' : '' }}>2 - Cukup
+                                                rekomendasi
+                                            </option>
+                                            <option value="3" {{ $data->value == 3 ? 'selected' : '' }}>
+                                                3 - Rekomendasi
+                                            </option>
+                                            <option value="4" {{ $data->value == 4 ? 'selected' : '' }}>4 -
+                                                Kurang
+                                                rekomendasi</option>
+                                            <option value="5" {{ $data->value == 5 ? 'selected' : '' }}>5 -
+                                                Sangat
+                                                kurang
+                                                rekomendasi</option>
+                                        @endif
                                     </select>
 
                                     @error('txtvalue')

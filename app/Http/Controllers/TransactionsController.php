@@ -85,10 +85,8 @@ class TransactionsController extends Controller
      */
     public function edit(Transactions $transactions, $id)
     {
-        $data = Transactions::find($id);
-        $gudang = Gudangs::where('is_active', 1)->get();
-        $creteria = Creteria::where('is_active', 1)->get();
-        return view('transaksi.update')->with(['data' => $data, 'creteria' => $creteria, 'gudang' => $gudang]);
+        $data = Transactions::with('gudangs', 'creteria')->find($id);
+        return view('transaksi.update')->with(['data' => $data]);
     }
 
     /**
